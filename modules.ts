@@ -1,12 +1,12 @@
-import * as ts from "typescript";
-import {factory} from "typescript";
+import * as ts from 'typescript'
+import { factory } from 'typescript'
 
 export class GodClass {
-  constructor(
+  constructor (
     private prevText = '',
     private imports: string[] = [],
-    private hasReadme = false ,
-    private hasAction = false ,
+    private hasReadme = false,
+    private hasAction = false,
     private parameters: ts.ObjectLiteralExpression | null = null,
     private template = '',
     private dataMethodReturnValue: ts.ObjectLiteralElementLike | null = null,
@@ -23,11 +23,10 @@ export class GodClass {
       template: this.template,
       dataMethodReturnValue: this.dataMethodReturnValue,
       methods: this.methods,
-      knobVariables: this.knobVariables,
+      knobVariables: this.knobVariables
     }
   }
 
-  setPrevText = (prevText: string) => { this.prevText = prevText }
   addImport = (importText: string) => { this.imports = this.imports.concat(importText) }
   setHasReadme = (hasReadme: boolean) => { this.hasReadme = hasReadme }
   setHasAction = (hasAction: boolean) => { this.hasAction = hasAction }
@@ -35,7 +34,6 @@ export class GodClass {
   setTemplate = (template: string) => { this.template = template }
   setDataMethodReturnValue = (dataMethodReturnValue: ts.ObjectLiteralElementLike) => { this.dataMethodReturnValue = dataMethodReturnValue }
   setMethods = (methods: ts.ObjectLiteralElementLike) => { this.methods = methods }
-  setKnobVariables = (knobVariables: KnobVariables) => { this.knobVariables = knobVariables }
 
   // SB コンポーネント名
   isPrevStoriesOf = (text: string) => text === 'Identifier: storiesOf'
@@ -76,7 +74,7 @@ export class GodClass {
       return
     }
 
-    this.knobVariables = this.knobVariables.concat({type, args})
+    this.knobVariables = this.knobVariables.concat({ type, args })
   }
 }
 
@@ -91,13 +89,13 @@ export type KnobVariable = {type: keyof typeof KnobFunc, args: any}
 export type KnobVariables = KnobVariable[]
 
 export const syntaxKindToName = (kind: ts.SyntaxKind): string => {
-  return ts.SyntaxKind[kind];
+  return ts.SyntaxKind[kind]
 }
 
 // ------------------------------
 // import
 // ------------------------------
-export const getFilteredImport = (imports: string[], {hasReadme}: { hasReadme: boolean }): string => {
+export const getFilteredImport = (imports: string[], { hasReadme }: { hasReadme: boolean }): string => {
   // filter で不要な import を削除し、
   // concat で必要な import を追加する
   let filtered: string[] = imports
@@ -107,35 +105,34 @@ export const getFilteredImport = (imports: string[], {hasReadme}: { hasReadme: b
   if (hasReadme) {
     filtered = filtered
       .filter(item => !item.includes('README'))
-      .concat(`import README from './README.md'`)
+      .concat('import README from \'./README.md\'')
   }
 
-  return filtered.join("\n")
+  return filtered.join('\n')
     .replace('withKnobs,', '')
     .replace("import { withKnobs } from '@storybook/addon-knobs'\n", '') // knob は `preview.js`で読み込むので不要
-    .replace('text,', '')      // knob の text を削除
-    .replace("'../../../CHANGELOG.md'", "'../../CHANGELOG.md'")      // knob の text を削除
-    .replace("'../../../CONTRIBUTE.md'", "'../../CONTRIBUTE.md'")      // knob の text を削除
+    .replace('text,', '') // knob の text を削除
+    .replace("'../../../CHANGELOG.md'", "'../../CHANGELOG.md'") // knob の text を削除
+    .replace("'../../../CONTRIBUTE.md'", "'../../CONTRIBUTE.md'") // knob の text を削除
   // .replace('../../values', '../values') // values の import の階層を浅くする
-
 }
 
 // ------------------------------
 // export default
 // ------------------------------
 export const getExportAssignmentProperties = ({
-                                                title,
-                                                component,
-                                                knobVariables,
-                                              }: { title: string, component: string, knobVariables: KnobVariables },
-                                              {
-                                                hasReadme,
-                                                isHTML,
-                                              }: { hasReadme: boolean; isHTML: boolean }
+  title,
+  component,
+  knobVariables
+}: { title: string, component: string, knobVariables: KnobVariables },
+{
+  hasReadme,
+  isHTML
+}: { hasReadme: boolean; isHTML: boolean }
 ) => {
   const properties: ts.ObjectLiteralElementLike[] = [
     ts.factory.createPropertyAssignment(
-      ts.factory.createIdentifier("title"),
+      ts.factory.createIdentifier('title'),
       ts.factory.createStringLiteral(title)
     )
   ]
@@ -144,7 +141,7 @@ export const getExportAssignmentProperties = ({
   if (!isHTML) {
     properties.push(
       ts.factory.createPropertyAssignment(
-        ts.factory.createIdentifier("component"),
+        ts.factory.createIdentifier('component'),
         ts.factory.createIdentifier(component)
       )
     )
@@ -152,24 +149,24 @@ export const getExportAssignmentProperties = ({
 
   if (hasReadme) {
     const parameters = factory.createPropertyAssignment(
-      factory.createIdentifier("parameters"),
+      factory.createIdentifier('parameters'),
       factory.createObjectLiteralExpression(
         [
           factory.createPropertyAssignment(
-            factory.createIdentifier("notes"),
+            factory.createIdentifier('notes'),
             factory.createObjectLiteralExpression(
               [factory.createShorthandPropertyAssignment(
-                factory.createIdentifier("README"),
+                factory.createIdentifier('README'),
                 undefined
               )],
               false
             )
           ),
           factory.createPropertyAssignment(
-            factory.createIdentifier("docs"),
+            factory.createIdentifier('docs'),
             factory.createObjectLiteralExpression(
               [factory.createPropertyAssignment(
-                factory.createIdentifier("extractComponentDescription"),
+                factory.createIdentifier('extractComponentDescription'),
                 factory.createParenthesizedExpression(factory.createArrowFunction(
                   undefined,
                   undefined,
@@ -178,7 +175,7 @@ export const getExportAssignmentProperties = ({
                       undefined,
                       undefined,
                       undefined,
-                      factory.createIdentifier("_"),
+                      factory.createIdentifier('_'),
                       undefined,
                       undefined,
                       undefined
@@ -190,7 +187,7 @@ export const getExportAssignmentProperties = ({
                       factory.createObjectBindingPattern([factory.createBindingElement(
                         undefined,
                         undefined,
-                        factory.createIdentifier("notes"),
+                        factory.createIdentifier('notes'),
                         undefined
                       )]),
                       undefined,
@@ -201,9 +198,9 @@ export const getExportAssignmentProperties = ({
                   undefined,
                   factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                   factory.createPropertyAccessChain(
-                    factory.createIdentifier("notes"),
+                    factory.createIdentifier('notes'),
                     factory.createToken(ts.SyntaxKind.QuestionDotToken),
-                    factory.createIdentifier("README")
+                    factory.createIdentifier('README')
                   )
                 ))
               )],
@@ -221,10 +218,10 @@ export const getExportAssignmentProperties = ({
   const selects = knobVariables.filter(item => item.type === KnobFunc.select)
 
   if (selects.length > 0) {
-    const props = selects.map(({args}) => {
+    const props = selects.map(({ args }) => {
       const isOptionString = !!args[1].text // args[1] が 配列なら false になる
-      const options = isOptionString ?
-        factory.createIdentifier(args[1].text)
+      const options = isOptionString
+        ? factory.createIdentifier(args[1].text)
         : args[1]
 
       return (
@@ -233,15 +230,15 @@ export const getExportAssignmentProperties = ({
           factory.createObjectLiteralExpression(
             [
               factory.createPropertyAssignment(
-                factory.createIdentifier("options"),
+                factory.createIdentifier('options'),
                 options
               ),
               factory.createPropertyAssignment(
-                factory.createIdentifier("control"),
+                factory.createIdentifier('control'),
                 factory.createObjectLiteralExpression(
                   [factory.createPropertyAssignment(
-                    factory.createIdentifier("type"),
-                    factory.createStringLiteral("select")
+                    factory.createIdentifier('type'),
+                    factory.createStringLiteral('select')
                   )],
                   false
                 )
@@ -249,11 +246,12 @@ export const getExportAssignmentProperties = ({
             ],
             true
           )
-        ))}
+        ))
+    }
     )
 
     const argTypes = factory.createPropertyAssignment(
-      factory.createIdentifier("argTypes"),
+      factory.createIdentifier('argTypes'),
       factory.createObjectLiteralExpression(
         props,
         true
@@ -266,7 +264,7 @@ export const getExportAssignmentProperties = ({
   return properties
 }
 
-export const createExportAssignmentAst = (node: ts.ObjectLiteralElementLike[]) =>  factory.createExportAssignment(
+export const createExportAssignmentAst = (node: ts.ObjectLiteralElementLike[]) => factory.createExportAssignment(
   undefined,
   undefined,
   undefined,
@@ -277,8 +275,8 @@ export const createExportAssignmentAst = (node: ts.ObjectLiteralElementLike[]) =
 )
 
 // const Template = () => {...}
-export const createTemplateVariableStatementAst = ({methods, component, template, isHTML}: { methods: ts.ObjectLiteralElementLike | null; component: string; template: string; isHTML: boolean }) => {
-  const getAdditionalPropertiesOfTemplate = ({methods}: { methods: ts.ObjectLiteralElementLike | null }) => {
+export const createTemplateVariableStatementAst = ({ methods, component, template, isHTML }: { methods: ts.ObjectLiteralElementLike | null; component: string; template: string; isHTML: boolean }) => {
+  const getAdditionalPropertiesOfTemplate = ({ methods }: { methods: ts.ObjectLiteralElementLike | null }) => {
     const props = []
 
     if (methods) {
@@ -287,31 +285,31 @@ export const createTemplateVariableStatementAst = ({methods, component, template
 
     return props
   }
-  const additionalPropertiesOfTemplate = getAdditionalPropertiesOfTemplate({methods})
+  const additionalPropertiesOfTemplate = getAdditionalPropertiesOfTemplate({ methods })
 
   const properties = [
     factory.createPropertyAssignment(
-      factory.createIdentifier("props"),
+      factory.createIdentifier('props'),
       factory.createCallExpression(
         factory.createPropertyAccessExpression(
-          factory.createIdentifier("Object"),
-          factory.createIdentifier("keys")
+          factory.createIdentifier('Object'),
+          factory.createIdentifier('keys')
         ),
         undefined,
-        [factory.createIdentifier("argTypes")]
+        [factory.createIdentifier('argTypes')]
       )
     ),
     factory.createPropertyAssignment(
-      factory.createIdentifier("template"),
+      factory.createIdentifier('template'),
       factory.createNoSubstitutionTemplateLiteral(template)
     ),
-    ...additionalPropertiesOfTemplate,
+    ...additionalPropertiesOfTemplate
   ]
 
   if (!isHTML) {
     properties.unshift(
       factory.createPropertyAssignment(
-        factory.createIdentifier("components"),
+        factory.createIdentifier('components'),
         factory.createObjectLiteralExpression(
           [factory.createShorthandPropertyAssignment(
             factory.createIdentifier(component),
@@ -327,7 +325,7 @@ export const createTemplateVariableStatementAst = ({methods, component, template
     undefined,
     factory.createVariableDeclarationList(
       [factory.createVariableDeclaration(
-        factory.createIdentifier("Template"),
+        factory.createIdentifier('Template'),
         undefined,
         undefined,
         factory.createArrowFunction(
@@ -338,7 +336,7 @@ export const createTemplateVariableStatementAst = ({methods, component, template
               undefined,
               undefined,
               undefined,
-              factory.createIdentifier("args"),
+              factory.createIdentifier('args'),
               undefined,
               undefined,
               undefined
@@ -350,7 +348,7 @@ export const createTemplateVariableStatementAst = ({methods, component, template
               factory.createObjectBindingPattern([factory.createBindingElement(
                 undefined,
                 undefined,
-                factory.createIdentifier("argTypes"),
+                factory.createIdentifier('argTypes'),
                 undefined
               )]),
               undefined,
@@ -371,7 +369,7 @@ export const createTemplateVariableStatementAst = ({methods, component, template
   )
 }
 
-const customCreatePropertyAssignment = (key: string, value: string, propType: 'string'  | 'number' | 'boolean' = 'string' ) => {
+const customCreatePropertyAssignment = (key: string, value: string, propType: 'string' | 'number' | 'boolean' = 'string') => {
   let propValue = null
 
   switch (propType) {
@@ -388,7 +386,7 @@ const customCreatePropertyAssignment = (key: string, value: string, propType: 's
       break
   }
 
-  if (propValue === null){
+  if (propValue === null) {
     throw new Error('propValue is null')
   }
 
@@ -400,9 +398,9 @@ const customCreatePropertyAssignment = (key: string, value: string, propType: 's
 
 // Default.args = {} のオブジェクトのプロパティを作成する
 export const getArgsAst = ({
-                             dataMethodReturnValue,
-                             knobVariables
-                           }: { dataMethodReturnValue: ts.ObjectLiteralElementLike | null, knobVariables: KnobVariables }) => {
+  dataMethodReturnValue,
+  knobVariables
+}: { dataMethodReturnValue: ts.ObjectLiteralElementLike | null, knobVariables: KnobVariables }) => {
   let args: any = []
 
   if (dataMethodReturnValue) {
@@ -413,7 +411,7 @@ export const getArgsAst = ({
   if (knobVariables.length > 0) {
     args = args.concat(
       knobVariables.map(
-        ({type, args}) => {
+        ({ type, args }) => {
           const key = args[0].text
 
           if (type === KnobFunc.text) {
@@ -421,7 +419,7 @@ export const getArgsAst = ({
           } else if (type === KnobFunc.number) {
             return customCreatePropertyAssignment(key, args[1].text, 'number')
           } else if (type === KnobFunc.boolean) {
-            const value = syntaxKindToName(args[1].kind) === 'TrueKeyword' ? 'true': 'false'
+            const value = syntaxKindToName(args[1].kind) === 'TrueKeyword' ? 'true' : 'false'
 
             return customCreatePropertyAssignment(key, value, 'boolean')
           } else if (type === KnobFunc.object) {
@@ -430,8 +428,10 @@ export const getArgsAst = ({
               args[1]
             )
           }
+
+          return false
         }
-      )
+      ).filter(Boolean)
     )
   }
 

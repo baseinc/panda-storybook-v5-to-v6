@@ -1,4 +1,4 @@
-import * as ts from "typescript"
+import * as ts from 'typescript'
 import * as fs from 'fs'
 import {
   getExportAssignmentProperties,
@@ -7,8 +7,8 @@ import {
   getArgsAst,
   syntaxKindToName,
   createExportAssignmentAst,
-  GodClass,
-} from "./bbq-modules";
+  GodClass
+} from './modules'
 
 // - [x] 5/31 時点で置換できないファイルのパターンを列挙する
 // - [x] コンポーネント名が取得できないパターンを列挙する
@@ -74,16 +74,16 @@ const sourceFile = ts.createSourceFile(outputFilename, code, ts.ScriptTarget.Lat
 // ------------------------------
 // setup
 // ------------------------------
-let prevText = ""
+let prevText = ''
 let component = ''
 let title = ''
-let isHTML = false
+const isHTML = false
 const godClass = new GodClass()
 
 // ------------------------------
 // traverse
 // ------------------------------
-function printRecursive(node: ts.Node, sourceFile: ts.SourceFile) {
+function printRecursive (node: ts.Node, sourceFile: ts.SourceFile) {
   const syntaxKind = syntaxKindToName(node.kind)
   const text = node.getText(sourceFile)
   const textWithSyntaxKind = `${syntaxKind}: ${text}`
@@ -159,11 +159,10 @@ printRecursive(sourceFile, sourceFile)
 const {
   imports,
   hasReadme,
-  hasAction,
   template,
   dataMethodReturnValue,
   methods,
-  knobVariables,
+  knobVariables
 } = godClass.getAll()
 
 // ------------------------------
@@ -185,18 +184,18 @@ const filteredImport = getFilteredImport(imports, { hasReadme })
 // ------------------------------
 // 元の Storybook コンポーネント名と区別するために V6 でディレクトリを分ける
 const storybookComponentTitle = hasV6Flag ? `V6/${title}` : title
-const exportAssignmentProperties = getExportAssignmentProperties({title: storybookComponentTitle, component, knobVariables}, {hasReadme, isHTML})
+const exportAssignmentProperties = getExportAssignmentProperties({ title: storybookComponentTitle, component, knobVariables }, { hasReadme, isHTML })
 const exportAssignmentAst = createExportAssignmentAst(exportAssignmentProperties)
 
 // ------------------------------
 // Storybook の const Template = () => ()
 // ------------------------------
-const templateVariableStatementAst = createTemplateVariableStatementAst({methods, component, template, isHTML})
+const templateVariableStatementAst = createTemplateVariableStatementAst({ methods, component, template, isHTML })
 
 // ------------------------------
 // args
 // ------------------------------
-const argsAst = getArgsAst({dataMethodReturnValue, knobVariables})
+const argsAst = getArgsAst({ dataMethodReturnValue, knobVariables })
 
 // ------------------------------
 // printer
@@ -205,7 +204,7 @@ const printer = ts.createPrinter()
 const printNode = (node: ts.Node) => printer.printNode(
   ts.EmitHint.Unspecified,
   node,
-  ts.createSourceFile('', '', ts.ScriptTarget.Latest),
+  ts.createSourceFile('', '', ts.ScriptTarget.Latest)
 )
 
 const exportAssignment = printNode(exportAssignmentAst)
@@ -225,13 +224,13 @@ const templateVariableDeclaration = templateVariableStatement.replace(/\\\$?.*}/
 // - [ ] 改行する
 
 // パースがうまくいかないので変数宣言として扱う
-const declaration = `const args = `
+const declaration = 'const args = '
 const argsDeclaration = `const args = ${args}`
 const argsSourceFile = ts.createSourceFile('', argsDeclaration, ts.ScriptTarget.Latest)
 const argsTransformerFactory: ts.TransformerFactory<ts.Node> = (ctx: ts.TransformationContext) => {
   return (rootNode) => {
     const visit = (node: ts.Node): ts.Node => {
-      node = ts.visitEachChild(node, visit, ctx);
+      node = ts.visitEachChild(node, visit, ctx)
 
       if (!ts.isCallExpression(node)) {
         return node
