@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "convert": "ts-node --files -r tsconfig-paths/register ast.ts"
+    "convert": "ts-node --files -r tsconfig-paths/register index.ts"
   },
   "devDependencies": {
     "@types/node": "^15.9.0",
