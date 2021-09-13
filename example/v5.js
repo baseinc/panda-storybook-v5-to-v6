@@ -1,5 +1,3 @@
-// bbq/stories/elements/button-group.stories.js
-
 import { action } from '@storybook/addon-actions'
 import { number, select, text, withKnobs } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/vue'
